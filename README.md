@@ -1,6 +1,6 @@
 # Ogu.Otp
 
-[![.NET Core Desktop](https://github.com/ogulcanturan/Ogu.Otp/actions/workflows/dotnet.yml/badge.svg?branch=master)](https://github.com/ogulcanturan/Ogu.Otp/actions/workflows/dotnet-desktop.yml)
+[![.NET](https://github.com/ogulcanturan/Ogu.Otp/actions/workflows/dotnet.yml/badge.svg?branch=master)](https://github.com/ogulcanturan/Ogu.Otp/actions/workflows/dotnet.yml)
 [![NuGet](https://img.shields.io/nuget/v/Ogu.Otp.svg?color=1ecf18)](https://nuget.org/packages/Ogu.Otp)
 [![Nuget](https://img.shields.io/nuget/dt/Ogu.Otp.svg?logo=nuget)](https://nuget.org/packages/Ogu.Otp)
 
