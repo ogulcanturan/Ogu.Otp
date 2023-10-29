@@ -3,38 +3,38 @@ using System.Collections.Generic;
 
 namespace Ogu.Otp
 {
-    public class TotpTokenProvider : BaseOtpTokenProvider
+    public class TotpTokenProvider : BaseOtpTokenProvider, ITotpTokenProvider
     {
-        private readonly TimeSpan _period;
-        private readonly TimeSpan _timeDifference;
+        public readonly TimeSpan Period;
+        public readonly TimeSpan TimeDifference;
    
-        public TotpTokenProvider(string issuer, HashAlgorithmKind hashAlgorithmKind, DigitCount digitCount, TimeSpan period, ushort pastTolerance, ushort futureTolerance, TimeSpan? timeDifference = null) : base(issuer, hashAlgorithmKind, digitCount, pastTolerance, futureTolerance)
+        public TotpTokenProvider(string issuer, TimeSpan? period = null, HashAlgorithmKind hashAlgorithmKind = HashAlgorithmKind.Sha1, DigitCount digitCount = DigitCount.Six,  ushort pastTolerance = 0, ushort futureTolerance = 0, TimeSpan? timeDifference = null) : base(issuer, hashAlgorithmKind, digitCount, pastTolerance, futureTolerance)
         {
-            _period = period;
-            _timeDifference = timeDifference ?? TimeSpan.Zero;
+            Period = period ?? TimeSpan.FromSeconds(30);
+            TimeDifference = timeDifference ?? TimeSpan.Zero;
         }
 
         public string GetUri(string audience, string secretKey)
         {
-            return GetUri(
+            return base.GetUri(
                 audience,
                 secretKey,
                 "totp",
-                new KeyValuePair<string, string>("period", ((long)_period.TotalSeconds).ToString()));
+                new KeyValuePair<string, string>("period", ((long)Period.TotalSeconds).ToString()));
         }
 
         public string GenerateCode(string secretKey, string modifier = null)
         {
-            var timestep = GetCurrentTimestepNumber(_period, _timeDifference);
+            var timestep = GetCurrentTimestepNumber(Period, TimeDifference);
 
             return base.GenerateCode(secretKey, timestep, modifier);
         }
 
-        public OtpValidationResult ValidateCode(string code, string secret, string modifier = null)
+        public OtpValidationResult ValidateCode(string code, string secretKey, string modifier = null)
         {
-            var timestep = GetCurrentTimestepNumber(_period, _timeDifference);
+            var timestep = GetCurrentTimestepNumber(Period, TimeDifference);
 
-            return base.ValidateCode(code, secret, timestep, modifier);
+            return base.ValidateCode(code, secretKey, timestep, modifier);
         }
 
 #if NETSTANDARD2_0 || NETFRAMEWORK

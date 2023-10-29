@@ -2,27 +2,27 @@
 
 namespace Ogu.Otp
 {
-    public class HotpTokenProvider : BaseOtpTokenProvider
+    public class HotpTokenProvider : BaseOtpTokenProvider, IHotpTokenProvider
     {
-        public HotpTokenProvider(string issuer, HashAlgorithmKind hashAlgorithmKind, DigitCount digitCount, ushort pastTolerance, ushort futureTolerance) : base(issuer, hashAlgorithmKind, digitCount, pastTolerance, futureTolerance) { }
+        public HotpTokenProvider(string issuer, HashAlgorithmKind hashAlgorithmKind = HashAlgorithmKind.Sha1, DigitCount digitCount = DigitCount.Six, ushort pastTolerance = 0, ushort futureTolerance = 0) : base(issuer, hashAlgorithmKind, digitCount, pastTolerance, futureTolerance) { }
 
         public string GetUri(string audience, string secretKey, long counter = 0)
         {
-            return GetUri(
+            return base.GetUri(
                 audience,
                 secretKey,
                 "hotp",
                 new KeyValuePair<string, string>("counter", counter.ToString()));
         }
 
-        public override string GenerateCode(string secretKey, long counter, string modifier = null)
+        public new string GenerateCode(string secretKey, long counter = 0, string modifier = null)
         {
             return base.GenerateCode(secretKey, counter, modifier);
         }
 
-        public override OtpValidationResult ValidateCode(string code, string secret, long counter, string modifier = null)
+        public new OtpValidationResult ValidateCode(string code, string secretKey, long counter, string modifier = null)
         {
-            return base.ValidateCode(code, secret, counter, modifier);
+            return base.ValidateCode(code, secretKey, counter, modifier);
         }
     }
 }

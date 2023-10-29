@@ -8,18 +8,18 @@ namespace Ogu.Otp
 {
     public abstract class BaseOtpTokenProvider
     {
-        protected readonly string Issuer;
-        protected readonly HashAlgorithmKind HashAlgorithmKind;
-        protected readonly DigitCount DigitCount;
-        protected readonly int PastTolerance;
-        protected readonly int FutureTolerance;
+        public readonly string Issuer;
+        public readonly HashAlgorithmKind HashAlgorithmKind;
+        public readonly DigitCount DigitCount;
+        public readonly int PastTolerance;
+        public readonly int FutureTolerance;
 
-        protected BaseOtpTokenProvider(string issuer, HashAlgorithmKind hashAlgorithmKind, DigitCount digitCount, ushort pastTolerance, ushort futureTolerance)
+        protected BaseOtpTokenProvider(string issuer, HashAlgorithmKind hashAlgorithmKind = HashAlgorithmKind.Sha1, DigitCount digitCount = DigitCount.Six, ushort pastTolerance = 0, ushort futureTolerance = 0)
         {
             Issuer = issuer;
             HashAlgorithmKind = hashAlgorithmKind;
             DigitCount = digitCount;
-            PastTolerance = pastTolerance;
+            PastTolerance = -pastTolerance;
             FutureTolerance = futureTolerance;
 
             if (PastTolerance > FutureTolerance)
@@ -62,7 +62,7 @@ namespace Ogu.Otp
 
         public string GenerateSecretKey() => Base32Helper.GenerateBase32(HashAlgorithmKind);
 
-        public virtual string GenerateCode(string secretKey, long variant, string modifier = null)
+        protected string GenerateCode(string secretKey, long variant, string modifier = null)
         {
             int otp;
 
@@ -73,14 +73,14 @@ namespace Ogu.Otp
 #if NET6_0_OR_GREATER
             otp = Rfc6238Helper.ComputeOtp(keyBytes, variant, (sbyte)DigitCount, modifierBytes);
 #else
-            otp = GetExpectedCode(variant, keyBytes, 0, modifierBytes);
+            otp = GetExpectedCode(HashAlgorithmKind, (sbyte)DigitCount, variant, keyBytes, 0, modifierBytes);
 #endif
             return otp.ToString($"D{(sbyte)DigitCount}", CultureInfo.InvariantCulture);
         }
 
-        public virtual OtpValidationResult ValidateCode(string code, string secret, long variant, string modifier = null)
+        protected OtpValidationResult ValidateCode(string code, string secret, long variant, string modifier = null)
         {
-            if (!int.TryParse(code, out int _code) || GetDigitCount(_code) != (sbyte)DigitCount)
+            if (code.Length != (sbyte)DigitCount)
             {
                 return new OtpValidationResult(false);
             }
@@ -96,9 +96,9 @@ namespace Ogu.Otp
 #if NET6_0_OR_GREATER
                 expectedCode = Rfc6238Helper.ComputeOtp(keyBytes, (variant + i), (sbyte)DigitCount, modifierBytes);
 #else
-                expectedCode = GetExpectedCode(variant, keyBytes, i, modifierBytes);
+                expectedCode = GetExpectedCode(HashAlgorithmKind, (sbyte)DigitCount, variant, keyBytes, i, modifierBytes);
 #endif
-                if (expectedCode == _code)
+                if (expectedCode.ToString($"D{(sbyte)DigitCount}", CultureInfo.InvariantCulture) == code)
                 {
                     return i != 0 ?
                         new OtpValidationResult(true, i) :
@@ -110,16 +110,16 @@ namespace Ogu.Otp
         }
 
 #if !NET6_0_OR_GREATER
-        protected virtual int GetExpectedCode(long variant, byte[] keyBytes, int i, byte[] modifierBytes)
+        private static int GetExpectedCode(HashAlgorithmKind hashAlgorithmKind, sbyte digitCount, long variant, byte[] keyBytes, int i, byte[] modifierBytes)
         {
             int expectedCode;
-            switch (HashAlgorithmKind)
+            switch (hashAlgorithmKind)
             {
                 case HashAlgorithmKind.Md5:
 
                     using (var hash = new HMACMD5(keyBytes))
                     {
-                        expectedCode = Rfc6238Helper.ComputeOtp(hash, (variant + i), (sbyte)DigitCount, modifierBytes);
+                        expectedCode = Rfc6238Helper.ComputeOtp(hash, (variant + i), digitCount, modifierBytes);
                     }
 
                     break;
@@ -128,7 +128,7 @@ namespace Ogu.Otp
 
                     using (var hash = new HMACSHA1(keyBytes))
                     {
-                        expectedCode = Rfc6238Helper.ComputeOtp(hash, (variant + i), (sbyte)DigitCount, modifierBytes);
+                        expectedCode = Rfc6238Helper.ComputeOtp(hash, (variant + i), digitCount, modifierBytes);
                     }
 
                     break;
@@ -137,7 +137,7 @@ namespace Ogu.Otp
 
                     using (var hash = new HMACSHA256(keyBytes))
                     {
-                        expectedCode = Rfc6238Helper.ComputeOtp(hash, (variant + i), (sbyte)DigitCount, modifierBytes);
+                        expectedCode = Rfc6238Helper.ComputeOtp(hash, (variant + i), digitCount, modifierBytes);
                     }
 
                     break;
@@ -146,7 +146,7 @@ namespace Ogu.Otp
 
                     using (var hash = new HMACSHA384(keyBytes))
                     {
-                        expectedCode = Rfc6238Helper.ComputeOtp(hash, (variant + i), (sbyte)DigitCount, modifierBytes);
+                        expectedCode = Rfc6238Helper.ComputeOtp(hash, (variant + i), digitCount, modifierBytes);
                     }
 
                     break;
@@ -155,7 +155,7 @@ namespace Ogu.Otp
 
                     using (var hash = new HMACSHA512(keyBytes))
                     {
-                        expectedCode = Rfc6238Helper.ComputeOtp(hash, (variant + i), (sbyte)DigitCount, modifierBytes);
+                        expectedCode = Rfc6238Helper.ComputeOtp(hash, (variant + i), digitCount, modifierBytes);
                     }
 
                     break;
@@ -167,7 +167,5 @@ namespace Ogu.Otp
             return expectedCode;
         }
 #endif
-
-        private static int GetDigitCount(int code) => (1 + (int)Math.Floor(Math.Log10(code)));
     }
 }
