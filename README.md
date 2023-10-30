@@ -24,6 +24,35 @@ dotnet add package Ogu.Otp
 ```
 ## Usage
 
+Totp:
+
+```csharp
+private static readonly TotpTokenProvider _totp = new TotpTokenProvider("MyAppName");
+
+var secretKey = _totp.GenerateSecretKey(); // Save this for further evaluations
+
+string uri = _totp.GetUri("Ogulcan", secretKey); // Needed for generating qr code
+
+var code = _totp.GenerateCode(secretKey); // After integrating Auth app (Google, Microsoft) will return this, or manually you can send this as time based email verification
+
+var otpValidationResult = _totp.ValidateCode(code, secretKey);
+```
+
+Hotp: 
+
+```csharp
+private static readonly HotpTokenProvider _hotp = new HotpTokenProvider("MyAppName");
+
+var secretKey = _hotp.GenerateSecretKey(); // Save this for further evaluations
+
+string uri = _hotp.GetUri("Ogulcan", secretKey); // Needed for generating qr code
+
+var code = _hotp.GenerateCode(secretKey); // After integrating auth app (Google, Microsoft) will return this, or manually you can send this as email verification
+
+long counter = 0; // if succeed, increase counter and save this
+
+var otpValidationResult = _hotp.ValidateCode(code, secretKey, counter);
+```
 **sample console app:** [Otp.Console](https://github.com/ogulcanturan/Ogu.Otp/blob/master/samples/Otp.Console/Program.cs/)
 
 **sample web app:** [Otp.Api](https://github.com/ogulcanturan/Ogu.Otp/blob/master/samples/Otp.Api/)
