@@ -1,4 +1,4 @@
-# Ogu.Otp
+# <img src="logo/ogu-logo.png" alt="Header" width="24"/> Ogu.Otp
 
 [![.NET](https://github.com/ogulcanturan/Ogu.Otp/actions/workflows/dotnet.yml/badge.svg?branch=master)](https://github.com/ogulcanturan/Ogu.Otp/actions/workflows/dotnet.yml)
 [![NuGet](https://img.shields.io/nuget/v/Ogu.Otp.svg?color=1ecf18)](https://nuget.org/packages/Ogu.Otp)
