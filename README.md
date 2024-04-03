@@ -53,11 +53,10 @@ long counter = 0; // if succeed, increase counter and save this
 
 var otpValidationResult = _hotp.ValidateCode(code, secretKey, counter);
 ```
-**sample console app:** [Otp.Console](https://github.com/ogulcanturan/Ogu.Otp/blob/master/samples/Otp.Console/Program.cs/)
 
-**sample web app:** [Otp.Api](https://github.com/ogulcanturan/Ogu.Otp/blob/master/samples/Otp.Api/)
+## Sample Application
+A sample application demonstrating the usage of Ogu.Otp [Console](https://github.com/ogulcanturan/Ogu.Otp/blob/master/samples/Otp.Console/), [Otp.Api](https://github.com/ogulcanturan/Ogu.Otp/blob/master/samples/Otp.Api/).
 
 ## Credits
-
 
 This library makes use of certain codes and resources from [AspNetCore](https://github.com/dotnet/aspnetcore), [Base32.cs](https://github.com/dotnet/aspnetcore/blob/main/src/Identity/Extensions.Core/src/Base32.cs), [Rfc6238AuthenticationService.cs](https://github.com/dotnet/aspnetcore/blob/main/src/Identity/Extensions.Core/src/Rfc6238AuthenticationService.cs)
