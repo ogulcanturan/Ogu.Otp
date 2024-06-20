@@ -64,7 +64,7 @@ namespace Otp.Console
             var secretKey = _totp.GenerateSecretKey();
             var code = _totp.GenerateCode(secretKey);
             _totpGeneratedSecretKeys.Add(_totpGeneratedSecretKeys.Count, secretKey);
-            string uri = _totp.GetUri("John", secretKey);
+            var uri = _totp.GetUri("John", secretKey);
 
             var otpValidationResult = _totp.ValidateCode(code, secretKey);
 
@@ -121,7 +121,7 @@ namespace Otp.Console
 
             System.Console.WriteLine("Enter the code:");
 
-            string code = System.Console.ReadLine();
+            var code = System.Console.ReadLine();
 
             var totpValidationResult = _totp.ValidateCode(code, secretKey);
 
@@ -134,7 +134,7 @@ namespace Otp.Console
             var secretKey = _hotp.GenerateSecretKey();
             var code = _hotp.GenerateCode(secretKey);
             _hotpGeneratedSecretKeys.Add(_hotpGeneratedSecretKeys.Count, (secretKey, 0));
-            string uri = _hotp.GetUri("John", secretKey);
+            var uri = _hotp.GetUri("John", secretKey);
             
             var otpValidationResult = _hotp.ValidateCode(code, secretKey, 0);
 
@@ -198,12 +198,12 @@ namespace Otp.Console
 
             System.Console.WriteLine("Enter the code:");
 
-            string code = System.Console.ReadLine();
+            var code = System.Console.ReadLine();
 
-            var totpValidationResult = _hotp.ValidateCode(code, secretKey, counter);
+            var hotpValidationResult = _hotp.ValidateCode(code, secretKey, counter);
 
-            System.Console.WriteLine($"IsCodeValid: {totpValidationResult.IsValid}\n" +
-                                     $"Tolerance: {totpValidationResult.Tolerance}\n" +
+            System.Console.WriteLine($"IsCodeValid: {hotpValidationResult.IsValid}\n" +
+                                     $"Tolerance: {hotpValidationResult.Tolerance}\n" +
                                      $"CurrenctCounter: {counter}\n" +
                                      $"NextCounter: {++counter}");
         }
@@ -211,10 +211,10 @@ namespace Otp.Console
         // Package: QRCoder
         private static void GenerateQrCode(string uri, bool saveAsPng)
         {
-            QRCodeGenerator qrGenerator = new QRCodeGenerator();
+            var qrGenerator = new QRCodeGenerator();
             QRCodeData qrCodeData = qrGenerator.CreateQrCode(uri, QRCodeGenerator.ECCLevel.M);
 
-            AsciiQRCode asciiQrCode = new AsciiQRCode(qrCodeData);
+            var asciiQrCode = new AsciiQRCode(qrCodeData);
             var qrCodeString = asciiQrCode.GetGraphic(1);
 
             System.Console.WriteLine(qrCodeString);
@@ -225,7 +225,7 @@ namespace Otp.Console
                 byte[] qrCodeBytes = sd.GetGraphic(20);
 
                 Bitmap qrCodeImage;
-                using (MemoryStream stream = new MemoryStream(qrCodeBytes))
+                using (var stream = new MemoryStream(qrCodeBytes))
                 {
                     qrCodeImage = new Bitmap(stream);
                 }
