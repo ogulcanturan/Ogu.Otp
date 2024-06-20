@@ -33,9 +33,10 @@ var secretKey = _totp.GenerateSecretKey(); // Save this for further evaluations
 
 string uri = _totp.GetUri("Ogulcan", secretKey); // Needed for generating qr code
 
-var code = _totp.GenerateCode(secretKey); // After integrating Auth app (Google, Microsoft) will return this, or manually you can send this as time based email verification
+// (optional) manually you can generate code ( e.g time based email verification ) but this generally returns from Auth app (Google, Microsoft)
+var code = _totp.GenerateCode(secretKey); 
 
-var otpValidationResult = _totp.ValidateCode(code, secretKey);
+var otpValidationResult = _totp.ValidateCode(code, secretKey); // validates the code and returns the validation result
 ```
 
 Hotp: 
@@ -47,11 +48,17 @@ var secretKey = _hotp.GenerateSecretKey(); // Save this for further evaluations
 
 string uri = _hotp.GetUri("Ogulcan", secretKey); // Needed for generating qr code
 
-var code = _hotp.GenerateCode(secretKey); // After integrating auth app (Google, Microsoft) will return this, or manually you can send this as email verification
+// (optional) manually you can generate code ( e.g time based email verification ) but this generally returns from Auth app (Google, Microsoft)
+var code = _hotp.GenerateCode(secretKey);
 
-long counter = 0; // if succeed, increase counter and save this
+long counter = 0;
 
 var otpValidationResult = _hotp.ValidateCode(code, secretKey, counter);
+
+if (otpValidationResult.IsValid)
+{
+    counter++; // increase the counter and save it to database
+}
 ```
 
 ## Sample Application
